@@ -5,8 +5,24 @@ include('../includes/db.php');
 // Fetch child ID from query string
 $child_id = isset($_GET['child_id']) ? intval($_GET['child_id']) : null;
 
+if (!$child_id) {
+    die("Error: Invalid child ID.");
+}
+
+// Fetch guardian ID dynamically
+$query = "SELECT guardian_id FROM guardians WHERE child_id = :child_id";
+$stmt = $conn->prepare($query);
+$stmt->bindParam(':child_id', $child_id, PDO::PARAM_INT);
+$stmt->execute();
+$guardian = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$guardian) {
+    die("Error: No guardian found for the specified child.");
+}
+
+$guardian_id = $guardian['guardian_id'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $guardian_id = $_POST['guardian_id'];
     $feedback_text = $_POST['feedback_text'];
     $rating = $_POST['rating'];
 
@@ -41,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php } ?>
 
         <form action="feedback.php?child_id=<?php echo $child_id; ?>" method="POST">
-            <input type="hidden" name="guardian_id" value="1"> <!-- Replace with dynamic guardian_id -->
+            <input type="hidden" name="guardian_id" value="<?php echo htmlspecialchars($guardian_id); ?>">
             <label for="feedback_text">Feedback:</label>
             <textarea id="feedback_text" name="feedback_text" required></textarea><br>
 

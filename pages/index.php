@@ -245,7 +245,7 @@ h2#guardiandetails {
     font-size: 2rem;
     margin-top: 30px;
     position: relative;
-    left:400px;
+    left:400px !important;
 }
 
 h1#reportchild {
